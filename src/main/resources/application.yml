@@ -1,0 +1,29 @@
+spring:
+  profiles:
+    active: local
+  application:
+    name: slice
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    hikari:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      jdbc-url: jdbc:mysql://localhost:3306/sdcb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      username: root
+      password: wjdehddnr1@
+      minimum-idle: 10
+      maximum-pool-size: 10
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    open-in-view: true
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
