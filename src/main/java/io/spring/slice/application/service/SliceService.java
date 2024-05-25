@@ -22,7 +22,7 @@ public class SliceService {
             Pageable pageable
     ) {
 
-        Slice<Board> boardList = getBoardList(cursorId, pageable);
+        Slice<Board> boardList = boardRepository.findAllLessThanCursorIdOrderByIdDesc(cursorId, pageable);
         Boolean hasNext = boardList.isEmpty()
                 ? null
                 : boardList.hasNext();
