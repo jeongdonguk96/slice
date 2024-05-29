@@ -22,12 +22,8 @@ public class BoardQuerydslRepositoryImpl implements BoardQuerydslRepository{
 
 
     @Override
-    public Slice<Board> findAllLessThanCursorIdOrderByIdDesc(
-            Long cursorId,
-            Pageable pageable
-    ) {
-
-        List<Board> boardList = queryFactory.selectFrom(board)
+    public Slice<Board> findAllLessThanCursorIdOrderByIdDesc(Long cursorId, Pageable pageable) {
+        List<Board> boards = queryFactory.selectFrom(board)
                 .leftJoin(board.member, member)
                 .fetchJoin()
                 .where(ltCursorId(cursorId))
@@ -35,15 +31,26 @@ public class BoardQuerydslRepositoryImpl implements BoardQuerydslRepository{
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
 
-        return checkLastPage(pageable, boardList);
+        return checkLastPage(pageable, boards);
+    }
+
+
+    @Override
+    public Slice<Board> searchLessThanCursorIdOrderByIdDescWith(Long cursorId, Pageable pageable, String keyword) {
+        List<Board> boards = queryFactory.selectFrom(board)
+                .leftJoin(board.member, member)
+                .fetchJoin()
+                .where(ltCursorId(cursorId), search(keyword))
+                .orderBy(board.id.desc())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+
+        return checkLastPage(pageable, boards);
     }
 
 
     // cursorId의 여부를 확인한 다음, 있다면 cursorId 보다 id가 작은 데이터를 반환한다.
-    private BooleanExpression ltCursorId(
-            Long cursorId
-    ) {
-
+    private BooleanExpression ltCursorId(Long cursorId) {
         if (cursorId == null) {
             return null;
         }
@@ -52,21 +59,27 @@ public class BoardQuerydslRepositoryImpl implements BoardQuerydslRepository{
     }
 
 
-    // Slice 객체를 반환하여 무한 스크롤을 처리한다.
-    private Slice<Board> checkLastPage(
-            Pageable pageable,
-            List<Board> boardList
-    ) {
+    // cursorId의 여부를 확인한 다음, 있다면 cursorId 보다 id가 작은 데이터를 반환한다.
+    private BooleanExpression search(String keyword) {
+        if (keyword == null) {
+            return null;
+        }
 
+        return board.title.contains(keyword);
+    }
+
+
+    // Slice 객체를 반환하여 무한 스크롤을 처리한다.
+    private Slice<Board> checkLastPage(Pageable pageable, List<Board> boards) {
         boolean hasNext = false;
 
         // 조회한 결과 개수가 요청한 페이지 사이즈보다 크면 true, 작으면 false
-        if (boardList.size() > pageable.getPageSize()) {
+        if (boards.size() > pageable.getPageSize()) {
+            boards.remove(pageable.getPageSize());
             hasNext = true;
-            boardList.remove(pageable.getPageSize());
         }
 
-        return new SliceImpl<>(boardList, pageable, hasNext);
+        return new SliceImpl<>(boards, pageable, hasNext);
     }
 
 }
