@@ -17,13 +17,26 @@ public class SliceService {
 
 
     @Transactional(readOnly = true)
-    public CursorResult<Board> getSlice(Long cursorId, Pageable pageable) {
+    public CursorResult<Board> getSlice(
+            Long cursorId,
+            Pageable pageable
+    ) {
+
         Slice<Board> boardList = boardRepository.findAllLessThanCursorIdOrderByIdDesc(cursorId, pageable);
         Boolean hasNext = boardList.isEmpty()
                 ? null
                 : boardList.hasNext();
 
         return new CursorResult<>(boardList, hasNext);
+    }
+
+
+    private Slice<Board> getBoardList(
+            Long cursorId,
+            Pageable pageable
+    ) {
+
+        return boardRepository.findAllLessThanCursorIdOrderByIdDesc(cursorId, pageable);
     }
 
 }
