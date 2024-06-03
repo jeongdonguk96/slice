@@ -28,14 +28,4 @@ public class SliceController {
         return sliceService.getSlice(cursorId, PageRequest.of(0, DEFAULT_SIZE));
     }
 
-
-    @GetMapping("/search")
-    public CursorResult<Board> getSearch(
-            @RequestParam(value = "cursorId", required = false) Long cursorId,
-            @RequestParam(value = "keyword", required = false) String keyword
-    ) {
-
-        return sliceService.getSearch(cursorId, PageRequest.of(0, DEFAULT_SIZE), keyword);
-    }
-
 }

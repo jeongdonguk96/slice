@@ -8,6 +8,4 @@ public interface BoardQuerydslRepository {
 
     Slice<Board> findAllLessThanCursorIdOrderByIdDesc(Long cursorId, Pageable pageable);
 
-    Slice<Board> searchLessThanCursorIdOrderByIdDescWith(Long cursorId, Pageable pageable, String keyword);
-
 }
